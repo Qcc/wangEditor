@@ -25,7 +25,17 @@ const config = {
         'undo',
         'redo'
     ],
-
+    // 增加默认代码高亮支持
+    codeLanguage: [
+        'PHP',
+        'css',
+        'html',
+        'javascript',
+        'java',
+        'csharp',
+        'cpp',
+        'c'
+    ],
     colors: [
         '#000000',
         '#eeece0',

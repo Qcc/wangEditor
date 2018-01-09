@@ -62,18 +62,24 @@ Code.prototype = {
         const type = !value ? 'new' : 'edit'
         const textId = getRandom('texxt')
         const btnId = getRandom('btn')
-
+        // 代码高亮配置
+        const config = this.editor.config
+        const codeLanguage = config.codeLanguage
+        const options = this._createOption(codeLanguage)
         const panel = new Panel(this, {
             width: 500,
             // 一个 Panel 包含多个 tab
             tabs: [
                 {
                     // 标题
-                    title: '插入代码',
+                    title: '插入代码111',
                     // 模板
                     tpl: `<div>
                         <textarea id="${textId}" style="height:145px;;">${value}</textarea>
                         <div class="w-e-button-container">
+                            <select name="codeLang">
+                                ${options}
+                            </select>
                             <button id="${btnId}" class="right">插入</button>
                         </div>
                     <div>`,
@@ -110,15 +116,22 @@ Code.prototype = {
         // 记录属性
         this.panel = panel
     },
-
+    // 生成select代码语言选择option
+    _createOption: function (codeLanguage) {
+        var option = ''
+        for(var i = 0; i < codeLanguage.length; i++){
+            option += `<option value=${codeLanguage[i]}>${codeLanguage[i]}</option>`
+        }
+        return option
+    },
     // 插入代码
-    _insertCode: function (value) {
+    _insertCode: function (value,language) {
         const editor = this.editor
-        editor.cmd.do('insertHTML', `<pre><code>${value}</code></pre><p><br></p>`)
+        editor.cmd.do('insertHTML', `<pre class="line-numbers"><code class="language-${language}">${value}</code></pre><p><br></p>`)
     },
 
     // 更新代码
-    _updateCode: function (value) {
+    _updateCode: function (value,language) {
         const editor = this.editor
         const $selectionELem = editor.selection.getSelectionContainerElem()
         if (!$selectionELem) {

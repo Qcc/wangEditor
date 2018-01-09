@@ -521,10 +521,9 @@ DomElement.prototype = {
             }
         });
     }
-};
 
-// new 一个对象
-function $(selector) {
+    // new 一个对象
+};function $(selector) {
     return new DomElement(selector);
 }
 
@@ -547,7 +546,8 @@ var config = {
 
     // 默认菜单配置
     menus: ['head', 'bold', 'italic', 'underline', 'strikeThrough', 'foreColor', 'backColor', 'link', 'list', 'justify', 'quote', 'emoticon', 'image', 'table', 'video', 'code', 'undo', 'redo'],
-
+    // 增加默认代码高亮支持
+    codeLanguage: ['PHP', 'css', 'html', 'javascript', 'java', 'csharp', 'cpp', 'c'],
     colors: ['#000000', '#eeece0', '#1c487f', '#4d80bf', '#c24f4a', '#8baa4a', '#7b5ba1', '#46acc8', '#f9963b', '#ffffff'],
 
     // // 语言配置
@@ -825,6 +825,17 @@ var config = {
     // 是否上传七牛云，默认为 false
     qiniu: false
 
+    // 上传图片自定义提示方法
+    // customAlert: function (info) {
+    //     // 自定义上传提示
+    // },
+
+    // // 自定义上传图片
+    // customUploadImg: function (files, insert) {
+    //     // files 是 input 中选中的文件列表
+    //     // insert 是获取图片 url 后，插入到编辑器的方法
+    //     insert(imgUrl)
+    // }
 };
 
 /*
@@ -845,10 +856,9 @@ var UA = {
     isIE: function isIE() {
         return 'ActiveXObject' in window;
     }
-};
 
-// 遍历对象
-function objForEach(obj, fn) {
+    // 遍历对象
+};function objForEach(obj, fn) {
     var key = void 0,
         result = void 0;
     for (key in obj) {
@@ -1443,9 +1453,8 @@ Link.prototype = {
                         // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                         return true;
                     }
-                }]
-            } // tab end
-            ] // tabs end
+                }] // tab end
+            }] // tabs end
         });
 
         // 显示 panel
@@ -2049,15 +2058,18 @@ Code.prototype = {
         var type = !value ? 'new' : 'edit';
         var textId = getRandom('texxt');
         var btnId = getRandom('btn');
-
+        // 代码高亮配置
+        var config = this.editor.config;
+        var codeLanguage = config.codeLanguage;
+        var options = this._createOption(codeLanguage);
         var panel = new Panel(this, {
             width: 500,
             // 一个 Panel 包含多个 tab
             tabs: [{
                 // 标题
-                title: '插入代码',
+                title: '插入代码111',
                 // 模板
-                tpl: '<div>\n                        <textarea id="' + textId + '" style="height:145px;;">' + value + '</textarea>\n                        <div class="w-e-button-container">\n                            <button id="' + btnId + '" class="right">\u63D2\u5165</button>\n                        </div>\n                    <div>',
+                tpl: '<div>\n                        <textarea id="' + textId + '" style="height:145px;;">' + value + '</textarea>\n                        <div class="w-e-button-container">\n                            <select name="codeLang">\n                                ' + options + '\n                            </select>\n                            <button id="' + btnId + '" class="right">\u63D2\u5165</button>\n                        </div>\n                    <div>',
                 // 事件绑定
                 events: [
                 // 插入代码
@@ -2079,9 +2091,8 @@ Code.prototype = {
                         // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                         return true;
                     }
-                }]
-            } // first tab end
-            ] // tabs end
+                }] // first tab end
+            }] // tabs end
         }); // new Panel end
 
         // 显示 panel
@@ -2090,15 +2101,22 @@ Code.prototype = {
         // 记录属性
         this.panel = panel;
     },
-
+    // 生成select代码语言选择option
+    _createOption: function _createOption(codeLanguage) {
+        var option = '';
+        for (var i = 0; i < codeLanguage.length; i++) {
+            option += '<option value=' + codeLanguage[i] + '>' + codeLanguage[i] + '</option>';
+        }
+        return option;
+    },
     // 插入代码
-    _insertCode: function _insertCode(value) {
+    _insertCode: function _insertCode(value, language) {
         var editor = this.editor;
-        editor.cmd.do('insertHTML', '<pre><code>' + value + '</code></pre><p><br></p>');
+        editor.cmd.do('insertHTML', '<pre class="line-numbers"><code class="language-' + language + '">' + value + '</code></pre><p><br></p>');
     },
 
     // 更新代码
-    _updateCode: function _updateCode(value) {
+    _updateCode: function _updateCode(value, language) {
         var editor = this.editor;
         var $selectionELem = editor.selection.getSelectionContainerElem();
         if (!$selectionELem) {
@@ -2295,9 +2313,8 @@ Table.prototype = {
                         // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                         return true;
                     }
-                }]
-            } // first tab end
-            ] // tabs end
+                }] // first tab end
+            }] // tabs end
         }); // panel end
 
         // 展示 panel
@@ -2635,9 +2652,8 @@ Video.prototype = {
                         // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                         return true;
                     }
-                }]
-            } // first tab end
-            ] // tabs end
+                }] // first tab end
+            }] // tabs end
         }); // panel end
 
         // 显示 panel
@@ -2826,9 +2842,8 @@ Image.prototype = {
                     // 返回 true 表示函数执行结束之后关闭 panel
                     return true;
                 }
-            }]
-        } // second tab end
-        ]; // tabs end
+            }] // second tab end
+        }]; // tabs end
 
         // 判断 tabs 的显示
         var tabsConfigResult = [];
