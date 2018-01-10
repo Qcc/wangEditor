@@ -2043,21 +2043,27 @@ Code.prototype = {
         // 选取是空，且没有夸元素选择，则插入 <pre><code></code></prev>
         if (this._active) {
             // 选中状态，将编辑内容
-            this._createPanel($startElem.html());
+            this._createPanel($startElem);
         } else {
             // 未选中状态，将创建内容
             this._createPanel();
         }
     },
-
-    _createPanel: function _createPanel(value) {
+    
+    _createPanel: function _createPanel($startElem) {
         var _this = this;
-
+        var value;
+        console.log('$startElem ', $startElem)
+        if($startElem !== undefined){
+            value = $startElem.html() || '';
+        }else{
+            value = '';            
+        }
         // value - 要编辑的内容
-        value = value || '';
         var type = !value ? 'new' : 'edit';
         var textId = getRandom('texxt');
         var btnId = getRandom('btn');
+        var selectId = getRandom('select');
         // 代码高亮配置
         var config = this.editor.config;
         var codeLanguage = config.codeLanguage;
@@ -2069,7 +2075,7 @@ Code.prototype = {
                 // 标题
                 title: '插入代码111',
                 // 模板
-                tpl: '<div>\n                        <textarea id="' + textId + '" style="height:145px;;">' + value + '</textarea>\n                        <div class="w-e-button-container">\n                            <select name="codeLang">\n                                ' + options + '\n                            </select>\n                            <button id="' + btnId + '" class="right">\u63D2\u5165</button>\n                        </div>\n                    <div>',
+                tpl: '<div>\n                        <textarea id="' + textId + '" style="height:145px;;">' + value + '</textarea>\n                        <div class="w-e-button-container">\n                            <select  id="' + selectId + '">\n                                ' + options + '\n                            </select>\n                            <button id="' + btnId + '" class="right">\u63D2\u5165</button>\n                        </div>\n                    <div>',
                 // 事件绑定
                 events: [
                 // 插入代码
@@ -2078,14 +2084,17 @@ Code.prototype = {
                     type: 'click',
                     fn: function fn() {
                         var $text = $('#' + textId);
+                        console.log('$text ',$text)
                         var text = $text.val() || $text.html();
                         text = replaceHtmlSymbol(text);
+                        var $selected = $('#' + selectId);
+                        var language = $selected[0].value;
                         if (type === 'new') {
                             // 新插入
-                            _this._insertCode(text);
+                            _this._insertCode(text, language);
                         } else {
                             // 编辑更新
-                            _this._updateCode(text);
+                            _this._updateCode(text, $selected, language);
                         }
 
                         // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
@@ -2116,12 +2125,14 @@ Code.prototype = {
     },
 
     // 更新代码
-    _updateCode: function _updateCode(value, language) {
+    _updateCode: function _updateCode(value, select) {
         var editor = this.editor;
         var $selectionELem = editor.selection.getSelectionContainerElem();
         if (!$selectionELem) {
             return;
         }
+        console.log('$selectionELem', $selectionELem)
+        $selectionELem.addClass('aaaaa')
         $selectionELem.html(value);
         editor.selection.restoreSelection();
     },

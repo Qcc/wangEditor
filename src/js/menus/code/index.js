@@ -49,6 +49,7 @@ Code.prototype = {
         // 选取是空，且没有夸元素选择，则插入 <pre><code></code></prev>
         if (this._active) {
             // 选中状态，将编辑内容
+        console.log('this._active ', this._active)        
             this._createPanel($startElem.html())
         } else {
             // 未选中状态，将创建内容
@@ -59,9 +60,11 @@ Code.prototype = {
     _createPanel: function (value) {
         // value - 要编辑的内容
         value = value || ''
+        console.log('value ', value)
         const type = !value ? 'new' : 'edit'
         const textId = getRandom('texxt')
         const btnId = getRandom('btn')
+        const selectId = getRandom('select')
         // 代码高亮配置
         const config = this.editor.config
         const codeLanguage = config.codeLanguage
@@ -77,7 +80,7 @@ Code.prototype = {
                     tpl: `<div>
                         <textarea id="${textId}" style="height:145px;;">${value}</textarea>
                         <div class="w-e-button-container">
-                            <select name="codeLang">
+                            <select  id="${selectId}">
                                 ${options}
                             </select>
                             <button id="${btnId}" class="right">插入</button>
@@ -93,12 +96,14 @@ Code.prototype = {
                                 const $text = $('#' + textId)
                                 let text = $text.val() || $text.html()
                                 text = replaceHtmlSymbol(text)
+                                const $selected = $('#' + selectId)
+                                let language = $selected[0].value
                                 if (type === 'new') {
                                     // 新插入
-                                    this._insertCode(text)
+                                    this._insertCode(text, language)
                                 } else {
                                     // 编辑更新
-                                    this._updateCode(text)
+                                    this._updateCode(text, $selected)
                                 }
 
                                 // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
@@ -131,12 +136,14 @@ Code.prototype = {
     },
 
     // 更新代码
-    _updateCode: function (value,language) {
+    _updateCode: function (value, select) {
         const editor = this.editor
         const $selectionELem = editor.selection.getSelectionContainerElem()
         if (!$selectionELem) {
             return
         }
+        console.log('$selectionELem')
+        // select[0].value = language
         $selectionELem.html(value)
         editor.selection.restoreSelection()
     },
