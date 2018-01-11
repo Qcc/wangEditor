@@ -3,7 +3,7 @@
 
 ## 介绍
 
-**wangEditor** —— 轻量级 web 富文本编辑器，配置方便，使用简单。支持 IE10+ 浏览器。
+**wangEditor**  基于wangEditor3.0.15,prism.js v1.9.0实现代码高亮 —— 轻量级 web 富文本编辑器，配置方便，使用简单。支持 IE10+ 浏览器。
 
 - 官网：[www.wangEditor.com](http://www.wangeditor.com/)
 - 文档：[www.kancloud.cn/wangfupeng/wangeditor3/332599](http://www.kancloud.cn/wangfupeng/wangeditor3/332599)
