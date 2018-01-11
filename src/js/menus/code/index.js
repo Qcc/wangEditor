@@ -49,18 +49,23 @@ Code.prototype = {
         // 选取是空，且没有夸元素选择，则插入 <pre><code></code></prev>
         if (this._active) {
             // 选中状态，将编辑内容
-        console.log('this._active ', this._active)        
-            this._createPanel($startElem.html())
+            this._createPanel($startElem)
         } else {
             // 未选中状态，将创建内容
             this._createPanel()
         }
     },
 
-    _createPanel: function (value) {
-        // value - 要编辑的内容
-        value = value || ''
-        console.log('value ', value)
+    _createPanel: function ($startElem) {
+        var _this = this
+        // $startElem - 要编辑的内容
+        var value,languageName
+        if($startElem !== undefined){
+            languageName = $startElem[0].className.split('-')[1]
+            value = $startElem.html() || ''
+        }else{
+            value = ''          
+        }
         const type = !value ? 'new' : 'edit'
         const textId = getRandom('texxt')
         const btnId = getRandom('btn')
@@ -68,17 +73,17 @@ Code.prototype = {
         // 代码高亮配置
         const config = this.editor.config
         const codeLanguage = config.codeLanguage
-        const options = this._createOption(codeLanguage)
+        const options = this._createOption(codeLanguage, languageName)
         const panel = new Panel(this, {
             width: 500,
             // 一个 Panel 包含多个 tab
             tabs: [
                 {
                     // 标题
-                    title: '插入代码111',
+                    title: '插入代码',
                     // 模板
                     tpl: `<div>
-                        <textarea id="${textId}" style="height:145px;;">${value}</textarea>
+                        <textarea id="${textId}" style="height:145px;">${value}</textarea>
                         <div class="w-e-button-container">
                             <select  id="${selectId}">
                                 ${options}
@@ -96,16 +101,16 @@ Code.prototype = {
                                 const $text = $('#' + textId)
                                 let text = $text.val() || $text.html()
                                 text = replaceHtmlSymbol(text)
-                                const $selected = $('#' + selectId)
-                                let language = $selected[0].value
+                                var $selected = $('#' + selectId)
+                                var language = $selected[0].value
                                 if (type === 'new') {
+                                    _this._insertCode(text, language)
                                     // 新插入
-                                    this._insertCode(text, language)
-                                } else {
                                     // 编辑更新
-                                    this._updateCode(text, $selected)
+                                } else {
+                                    language = $selected[0].value                           
+                                    _this._updateCode(text, language)
                                 }
-
                                 // 返回 true，表示该事件执行完之后，panel 要关闭。否则 panel 不会关闭
                                 return true
                             }
@@ -122,10 +127,14 @@ Code.prototype = {
         this.panel = panel
     },
     // 生成select代码语言选择option
-    _createOption: function (codeLanguage) {
+    _createOption: function _createOption(codeLanguage, selected) {
         var option = ''
-        for(var i = 0; i < codeLanguage.length; i++){
-            option += `<option value=${codeLanguage[i]}>${codeLanguage[i]}</option>`
+        for (var i = 0; i < codeLanguage.length; i++) {
+            if(codeLanguage[i] === selected){
+                option += '<option value=' + codeLanguage[i] + ' selected>' + codeLanguage[i] + '</option>'
+            }else{
+                option += '<option value=' + codeLanguage[i] + '>' + codeLanguage[i] + '</option>'
+            }
         }
         return option
     },
@@ -136,14 +145,14 @@ Code.prototype = {
     },
 
     // 更新代码
-    _updateCode: function (value, select) {
+    _updateCode: function (value, language) {
         const editor = this.editor
         const $selectionELem = editor.selection.getSelectionContainerElem()
         if (!$selectionELem) {
             return
         }
-        console.log('$selectionELem')
-        // select[0].value = language
+        $selectionELem.removeClass($selectionELem[0].className)
+        $selectionELem.addClass('language-'+language)
         $selectionELem.html(value)
         editor.selection.restoreSelection()
     },
